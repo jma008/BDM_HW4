@@ -67,7 +67,7 @@ def computations(x):
     stdev = np.std(x[1])
     low = max(0, int(median - stdev))
     high = max(0, int(median + stdev))
-    return (str(year), '2020-' + str(date), int(median), low, high)
+    return (str(year), '2020-' + str(date), median, low, high)
 
 def join_csv(database):
     return ','.join([str(data) for data in database])
@@ -79,18 +79,18 @@ def main(sc):
     headers = sc.parallelize(['year,date,median,low,high'])
 
     for file in category_names:
-        place_id = set(core_places \
-                       .mapPartitionsWithIndex(extract_categories) \
+        place_id = core_places \
+                       .map(extract_categories) \
                        .map(lambda x: x[0]) \
-                       .collect())
+                       .collect()
         date_visits = weekly_pattern \
-            .mapPartitionsWithIndex(extract_visits) \
+            .map(extract_visits) \
             .filter(lambda x: x[0] in place_id) \
-            .map(lambda x: (x[1][0][:10], x[1][1])) \
-            .filter(lambda x: x[0][:4] !='2018') \
+            .map(lambda x: (x[1][0][:10], x[1][1])) \ 
             .flatMap(date_conversion) \
             .reduceByKey(lambda x, y: x + y) \
             .map(computations) \
+            .filter(lambda x: x[0][:4] !='2018') \
             .sortBy(lambda x: (x[0], x[1])) \
             .map(join_csv)
 
