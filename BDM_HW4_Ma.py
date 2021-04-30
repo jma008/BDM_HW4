@@ -25,8 +25,8 @@ categories = {
     "445110": "supermarkets_except_convenience_stores"
 }
 
-category_names = [set(categories.values())]
-naics_codes = [set(categories.keys())]
+category_names = list(set(categories.values()))
+naics_codes = list(set(categories.keys()))
 
 
 
