@@ -27,7 +27,7 @@ categories = {
 
 category_names = list(set(categories.values()))
 naics_codes = list(set(categories.keys()))
-headers = sc.parallelize(['year,date,median,low,high'])
+
 
 
 # extract categories with naics codes
@@ -76,6 +76,7 @@ def join_csv(database):
 def main(sc):
     core_places = sc.textFile('hdfs:///data/share/bdm/core-places-nyc.csv')
     weekly_pattern = sc.textFile('hdfs:///data/share/bdm/weekly-patterns-nyc-2019-2020/*')
+    headers = sc.parallelize(['year,date,median,low,high'])
 
     for file in category_names:
         place_id = set(core_places \
