@@ -1,6 +1,6 @@
 import csv
 import datetime
-#import json
+import json
 import numpy as np
 from pyspark import SparkContext
 import sys
@@ -55,9 +55,9 @@ def extract_visits(partId, records):
 def date_conversion(x):
     start_date = datetime.datetime.strptime(x[0], "%Y-%m-%d")
     # end_date = datetime.datetime.strptime(x[1][1][:10], "%Y-%m-%d")
-    #visits_by_day = json.loads(x[1])
+    visits_by_day = json.loads(x[1])
     return [((start_date + datetime.timedelta(days=day)).date().isoformat(), [int(visit)])
-            for day, visit in enumerate(x[1][1:-1].split(','))]
+            for day, visit in enumerate(visits_by_day[1:-1])]
 
 
 def computations(x):
@@ -74,16 +74,16 @@ def join_csv(database):
 
 
 def main(sc):
-    core_places = sc.textFile('hdfs:///data/share/bdm/core-places-nyc.csv')
-    weekly_pattern = sc.textFile('hdfs:///data/share/bdm/weekly-patterns-nyc-2019-2020/*')
+    #core_places = sc.textFile('hdfs:///data/share/bdm/core-places-nyc.csv')
+    #weekly_pattern = sc.textFile('hdfs:///data/share/bdm/weekly-patterns-nyc-2019-2020/*')
     headers = sc.parallelize(['year,date,median,low,high'])
 
     for file in category_names:
-        place_id = set(core_places \
+        place_id = set(sc.textFile('hdfs:///data/share/bdm/core-places-nyc.csv') \
                        .mapPartitionsWithIndex(extract_categories) \
                        .map(lambda x: x[0]) \
                        .collect())
-        date_visits = weekly_pattern \
+        date_visits = sc.textFile('hdfs:///data/share/bdm/weekly-patterns-nyc-2019-2020/*') \
             .mapPartitionsWithIndex(extract_visits) \
             .filter(lambda x: x[0] in place_id) \
             .map(lambda x: (x[1][0][:10], x[1][1])) \
