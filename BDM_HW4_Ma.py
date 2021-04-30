@@ -25,8 +25,8 @@ categories = {
     "445110": "supermarkets_except_convenience_stores"
 }
 
-category_names = list(set(categories.values()))
-naics_codes = list(set(categories.keys()))
+category_names = [set(categories.values())]
+naics_codes = [set(categories.keys())]
 
 
 
@@ -57,7 +57,7 @@ def date_conversion(x):
     # end_date = datetime.datetime.strptime(x[1][1][:10], "%Y-%m-%d")
     visits_by_day = json.loads(x[1])
     return [((start_date + datetime.timedelta(days=day)).date().isoformat(), [int(visit)])
-            for day, visit in enumerate(visits_by_day)]
+            for day, visit in enumerate(visits_by_day[1:])]
 
 
 def computations(x):
@@ -80,7 +80,6 @@ def main(sc):
 
     for file in category_names:
         place_id = set(core_places \
-                       # .map(lambda x: x.split(',')) \
                        .mapPartitionsWithIndex(extract_categories) \
                        .map(lambda x: x[0]) \
                        .collect())
@@ -92,7 +91,7 @@ def main(sc):
             .flatMap(date_conversion) \
             .reduceByKey(lambda x, y: x + y) \
             .map(computations) \
-            .sortBy(lambda x: x) \
+            .sortBy(lambda x: (x[0], x[1])) \
             .map(join_csv)
 
         headers.union(date_visits).saveAsTextFile(output_prefix + '/' + file)
