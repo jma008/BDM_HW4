@@ -74,20 +74,20 @@ def join_csv(database):
 
 
 def main(sc):
-    #core_places = sc.textFile('hdfs:///data/share/bdm/core-places-nyc.csv')
-    #weekly_pattern = sc.textFile('hdfs:///data/share/bdm/weekly-patterns-nyc-2019-2020/*')
+    core_places = sc.textFile('hdfs:///data/share/bdm/core-places-nyc.csv')
+    weekly_pattern = sc.textFile('hdfs:///data/share/bdm/weekly-patterns-nyc-2019-2020/*')
     headers = sc.parallelize(['year,date,median,low,high'])
 
     for file in category_names:
-        place_id = set(sc.textFile('hdfs:///data/share/bdm/core-places-nyc.csv') \
+        place_id = set(core_places \
                        .mapPartitionsWithIndex(extract_categories) \
                        .map(lambda x: x[0]) \
                        .collect())
-        date_visits = sc.textFile('hdfs:///data/share/bdm/weekly-patterns-nyc-2019-2020/*') \
+        date_visits = weekly_pattern \
             .mapPartitionsWithIndex(extract_visits) \
             .filter(lambda x: x[0] in place_id) \
             .map(lambda x: (x[1][0][:10], x[1][1])) \
-            .filter(lambda x: x[0][:4] in ['2019','2020']) \
+            .filter(lambda x: x[0][:4] !='2018') \
             .flatMap(date_conversion) \
             .reduceByKey(lambda x, y: x + y) \
             .map(computations) \
