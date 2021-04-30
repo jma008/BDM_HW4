@@ -25,9 +25,9 @@ categories = {
     "445110": "supermarkets_except_convenience_stores"
 }
 
-category_names = tuple(set(categories.values()))
-naics_codes = tuple(set(categories.keys()))
-headers = tuple(('year', 'date', 'median', 'low', 'high'))
+category_names = list(set(categories.values()))
+naics_codes = list(set(categories.keys()))
+headers = list(('year', 'date', 'median', 'low', 'high'))
 
 
 # extract categories with naics codes
