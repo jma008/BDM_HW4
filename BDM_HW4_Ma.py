@@ -67,7 +67,7 @@ def computations(x):
     stdev = np.std(x[1])
     low = max(0, int(median - stdev))
     high = max(0, int(median + stdev))
-    return str(year), '2020-' + str(date), int(median), low, high
+    return (str(year), '2020-' + str(date), int(median), low, high)
 
 def join_csv(database):
     return ','.join([str(data) for data in database])
@@ -87,7 +87,7 @@ def main(sc):
             .mapPartitionsWithIndex(extract_visits) \
             .filter(lambda x: x[0] in place_id) \
             .map(lambda x: (x[1][0][:10], x[1][1])) \
-            .filter(lambda x: x[0][:4] != '2018') \
+            .filter(lambda x: x[0][:4] in ['2019','2020']) \
             .flatMap(date_conversion) \
             .reduceByKey(lambda x, y: x + y) \
             .map(computations) \
