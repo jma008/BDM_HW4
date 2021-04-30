@@ -27,7 +27,7 @@ categories = {
 
 category_names = list(set(categories.values()))
 naics_codes = list(set(categories.keys()))
-headers = list(('year', 'date', 'median', 'low', 'high'))
+headers = sc.parallelize(list(('year,date,median,low,high')))
 
 
 # extract categories with naics codes
