@@ -74,8 +74,8 @@ def join_csv(database):
 
 
 def main(sc):
-    core_places = sc.textFile('hdfs:///data/share/bdm/core-places-nyc.csv', use_unicode=False).cache()
-    weekly_pattern = sc.textFile('hdfs:///data/share/bdm/weekly-patterns-nyc-2019-2020/*', use_unicode=False).cache()
+    core_places = sc.textFile('hdfs:///data/share/bdm/core-places-nyc.csv')
+    weekly_pattern = sc.textFile('hdfs:///data/share/bdm/weekly-patterns-nyc-2019-2020/*')
 
     for file in category_names:
         place_id = set(core_places \
