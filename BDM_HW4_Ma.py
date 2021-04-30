@@ -57,7 +57,7 @@ def date_conversion(x):
     # end_date = datetime.datetime.strptime(x[1][1][:10], "%Y-%m-%d")
     visits_by_day = json.loads(x[1])
     return [((start_date + datetime.timedelta(days=day)).date().isoformat(), [int(visit)])
-            for day, visit in enumerate(visits_by_day[1:-1])]
+            for day, visit in enumerate(visits_by_day)]
 
 
 def computations(x):
