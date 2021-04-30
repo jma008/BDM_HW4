@@ -86,7 +86,7 @@ def main(sc):
         date_visits = weekly_pattern \
             .map(extract_visits) \
             .filter(lambda x: x[0] in place_id) \
-            .map(lambda x: (x[1][0][:10], x[1][1])) \ 
+            .map(lambda x: (x[1][0][:10], x[1][1])) \
             .flatMap(date_conversion) \
             .reduceByKey(lambda x, y: x + y) \
             .map(computations) \
