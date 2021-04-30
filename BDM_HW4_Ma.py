@@ -56,7 +56,7 @@ def date_conversion(x):
     # end_date = datetime.datetime.strptime(x[1][1][:10], "%Y-%m-%d")
     visits_by_day = json.loads(x[1])
     return [((start_date + datetime.timedelta(days=day)).date().isoformat(), [int(visit)])
-            for day, visit in enumerate(visits_by_day)]
+            for day, visit in enumerate(visits_by_day[1:-1])]
 
 
 def computations(x):
@@ -87,10 +87,10 @@ def main(sc):
             .mapPartitionsWithIndex(extract_visits) \
             .filter(lambda x: x[0] in place_id) \
             .map(lambda x: (x[1][0][:10], x[1][1])) \
-            .filter(lambda x: x[0][:4] != '2018') \
             .flatMap(date_conversion) \
             .reduceByKey(lambda x, y: x + y) \
             .map(computations) \
+            .filter(lambda x: x[0][:4] != '2018') \
             .sortBy(lambda x: (x[0], x[1])) \
             .map(join_csv)
 
