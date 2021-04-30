@@ -92,7 +92,7 @@ def main(sc):
             .flatMap(date_conversion) \
             .reduceByKey(lambda x, y: x + y) \
             .map(computations) \
-            .sortBy(lambda x: x[0]) \
+            .sortBy(lambda x: x) \
             .map(join_csv)
 
         headers.union(date_visits).saveAsTextFile(output_prefix + '/' + file)
