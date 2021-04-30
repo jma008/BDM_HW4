@@ -1,7 +1,6 @@
 import csv
 import datetime
 import numpy as np
-import json
 from pyspark import SparkContext
 import sys
 
@@ -55,9 +54,9 @@ def extract_visits(partId, records):
 def date_conversion(x):
     start_date = datetime.datetime.strptime(x[0], "%Y-%m-%d")
     # end_date = datetime.datetime.strptime(x[1][1][:10], "%Y-%m-%d")
-    visits_by_day = json.loads(x[1][1:])
+    visits_by_day = x[1][1:]
     return [((start_date + datetime.timedelta(days=day)).date().isoformat(), [int(visit)])
-            for day, visit in enumerate(visits_by_day)]
+            for day, visit in enumerate(visits_by_day.split(','))]
 
 
 def computations(x):
