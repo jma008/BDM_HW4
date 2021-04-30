@@ -56,14 +56,14 @@ def date_conversion(x):
     start_date = datetime.datetime.strptime(x[0], "%Y-%m-%d")
     # end_date = datetime.datetime.strptime(x[1][1][:10], "%Y-%m-%d")
     visits_by_day = json.loads(x[1])
-    return [((start_date + datetime.timedelta(days=day)).date().isoformat(), [int(visit)])
-            for day, visit in enumerate(visits_by_day[1:])]
+    return list(((start_date + datetime.timedelta(days=day)).date().isoformat(), [int(visit)])
+            for day, visit in enumerate(visits_by_day[1:]))
 
 
 def computations(x):
     year = x[0][:4]
     date = x[0][5:]
-    median = np.median(x[1])
+    median = int(np.median(x[1]))
     stdev = np.std(x[1])
     low = max(0, int(median - stdev))
     high = max(0, int(median + stdev))
