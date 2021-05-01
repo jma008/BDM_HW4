@@ -38,7 +38,7 @@ def extract_categories(partId, records):
     for row in reader:
         if row[9] in naics_codes:
             # yield place id by looking at naics code
-            yield row[1], row[9]
+            yield (row[1], row[9])
 
 
 def extract_visits(partId, records):
@@ -48,7 +48,7 @@ def extract_visits(partId, records):
 
     for row in reader:
         # yield place_id, start_date and visits_by_day
-        yield row[1], (row[12], row[16])
+        yield (row[1], (row[12], row[16]))
 
 
 def date_conversion(x):
@@ -56,7 +56,7 @@ def date_conversion(x):
     # end_date = datetime.datetime.strptime(x[1][1][:10], "%Y-%m-%d")
     visits_by_day = json.loads(x[1])
     return [((start_date + datetime.timedelta(days=day)).date().isoformat(), [int(visit)])
-            for day, visit in enumerate(visits_by_day[1:-1])]
+            for day, visit in enumerate(visits_by_day)]
 
 
 def computations(x):
