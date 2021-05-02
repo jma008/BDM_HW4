@@ -84,7 +84,7 @@ def main(sc):
             .sortBy(lambda x: (x[0], x[1])) \
             .map(join_csv)
 
-        headers.union(date_visits).saveAsTextFile(output_prefix + '/' + file)
+        headers.union(date_visits).saveAsTextFile(output_prefix + '/' + category)
 
 
 if __name__ == '__main__':
