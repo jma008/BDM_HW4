@@ -81,7 +81,7 @@ def main(sc):
             .reduceByKey(lambda x, y: x + y) \
             .map(computations) \
             .filter(lambda x: x[0][:4] != '2018') \
-            .sortBy(lambda x: (x[0],x[1]) \
+            .sortBy(lambda x: (x[0],x[1])) \
             .map(join_csv)
 
         headers.union(date_visits).saveAsTextFile(output_prefix + '/' + category)
