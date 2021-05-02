@@ -6,27 +6,18 @@ from pyspark import SparkContext
 import sys
 
 categories = {
-    "452210": "big_box_grocers",
-    "452311": "big_box_grocers",
-    "445120": "convenience_stores",
-    "722410": "drinking_places",
-    "722511": "full_service_restaurants",
-    "722513": "limited_service_restaurants",
-    "446110": "pharmacies_and_drug_stores",
-    "446191": "pharmacies_and_drug_stores",
-    "311811": "snack_and_bakeries",
-    "722515": "snack_and_bakeries",
-    "445210": "specialty_food_stores",
-    "445220": "specialty_food_stores",
-    "445230": "specialty_food_stores",
-    "445291": "specialty_food_stores",
-    "445292": "specialty_food_stores",
-    "445299": "specialty_food_stores",
-    "445110": "supermarkets_except_convenience_stores"
-}
+            'big_box_grocers': ['452210', '452311'],
+            'convenience_stores': ['445120'],
+            'drinking_places': ['722410'],
+            'full_service_restaurants': ['722511'],    
+            'limited_service_restaurants': ['722513'],
+            'pharmacies_and_drug_stores': ['446110', '446191'],
+            'snack_and_bakeries': ['311811', '722515'],
+            'specialty_food_stores': ['445210', '445220', '445230', '445291', '445292',  '445299'],
+            'supermarkets_except_convenience_stores': ['445110']
+            }
 
-category_names = list(set(categories.values()))
-naics_codes = list(set(categories.keys()))
+category_names = list(set(categories.keys()))
 
 
 # extract categories with naics codes
@@ -36,10 +27,8 @@ def extract_categories(partId, records):
 
     reader = csv.reader(records)
     for row in reader:
-        if row[9] in naics_codes:
-            # yield place id by looking at naics code
-            yield (row[1], row[9])
-
+        yield (row[1], row[9])
+            
 
 def extract_visits(partId, records):
     if partId == 0:
@@ -78,19 +67,20 @@ def main(sc):
     weekly_pattern = sc.textFile('hdfs:///data/share/bdm/weekly-patterns-nyc-2019-2020/*')
     headers = sc.parallelize(['year,date,median,low,high'])
 
-    for file in category_names:
+    for category in category_names:
         place_id = set(core_places \
                        .mapPartitionsWithIndex(extract_categories) \
+                       .filter(lambda x: x[1] in categories[category])
                        .map(lambda x: x[0]) \
                        .collect())
         date_visits = weekly_pattern \
             .mapPartitionsWithIndex(extract_visits) \
             .filter(lambda x: x[0] in place_id) \
             .map(lambda x: (x[1][0][:10], x[1][1])) \
+            .filter(lambda x: x[0][:4] != '2018') \
             .flatMap(date_conversion) \
             .reduceByKey(lambda x, y: x + y) \
             .map(computations) \
-            .filter(lambda x: x[0][:4] != '2018') \
             .sortBy(lambda x: (x[0], x[1])) \
             .map(join_csv)
 
