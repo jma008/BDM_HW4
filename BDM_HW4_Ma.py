@@ -77,10 +77,10 @@ def main(sc):
             .mapPartitionsWithIndex(extract_visits) \
             .filter(lambda x: x[0] in place_id) \
             .map(lambda x: (x[1][0][:10], x[1][1])) \
-            .filter(lambda x: x[0][:4] != '2018') \
             .flatMap(date_conversion) \
             .reduceByKey(lambda x, y: x + y) \
             .map(computations) \
+            .filter(lambda x: x[0][:4] != '2018') \
             .sortBy(lambda x: x) \
             .map(join_csv)
 
